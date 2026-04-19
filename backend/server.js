@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
 app.post('/analyze',upload.single('resume') , async(req,res)=>{
     const pdfData=await pdfParse(req.file.buffer)
     const resumeText = pdfData.text
-    
+
     const response = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
     messages: [
