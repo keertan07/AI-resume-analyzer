@@ -6,9 +6,9 @@ const cors = require('cors')
 const multer = require('multer')
 const pdfParse = require('@cyber2024/pdf-parse-fixed')
 
-const OpenAI=require('openai')
+const Groq=require('groq-sdk')
 
-const openai = new OpenAI({ apiKey: process.env.resume_analyzer_key })
+const groq = new Groq({ apiKey: process.env.resume_analyzer })
 const upload = multer({ storage: multer.memoryStorage() })
 
 const app = express()
@@ -24,8 +24,8 @@ app.post('/analyze',upload.single('resume') , async(req,res)=>{
     const pdfData=await pdfParse(req.file.buffer)
     const resumeText = pdfData.text
 
-    const response = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
+    const response = await groq.chat.completions.create({
+    model: 'llama-3.3-70b-versatile',
     messages: [
       {
         role: 'system',
