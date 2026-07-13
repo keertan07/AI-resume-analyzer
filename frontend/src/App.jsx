@@ -5,25 +5,37 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const[jobDesc,setjobDesc] = useState("")
+  const [error, setError] = useState(null)//updated
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";//updated
 
   const handleAnalyze = async () => {
     if (!file) {
       alert('Please select a file first')
       return
     }
-    setLoading(true)
+    setError(null);//updated
+    setResult(null);//updated
+    setLoading(true);
     const formData = new FormData()
     formData.append('resume', file)
     formData.append('jobDesc',jobDesc)
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/analyze`, {
-        method: 'POST',
-        body: formData
-      })
+      const response = await fetch(//updated
+        `${API_URL}/analyze`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+      if (!response.ok) {//updated
+        const err = await response.json().catch(() => ({}))
+        throw new Error(err.error || `Request failed with status ${response.status}`)
+      }   
       const data = await response.json()
       setResult(data)
     } catch (error) {
-      alert('Something went wrong')
+      setError(error.message || 'Something went wrong. Please try again.')//updated
     } finally {
       setLoading(false)
     }
@@ -49,7 +61,7 @@ function App() {
           className="block w-full text-gray-300 mb-4"
         />
         <textarea placeholder="Paste the job description here..."
-          onChange={(e) => setJobDesc(e.target.value)}
+          onChange={(e) => setjobDesc(e.target.value)}
           className="w-full bg-gray-800 text-gray-300 rounded-xl p-3 mt-2 h-32 resize-none"
         />
         <button
@@ -58,6 +70,8 @@ function App() {
         >
           {loading ? 'Analyzing...' : 'Analyze Resume'}
         </button>
+        //updated Error Message 
+        {error && <div className="text-red-500 mt-2">{error}</div>}
       </div>
 
       {/* Results */}
